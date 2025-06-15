@@ -115,7 +115,7 @@ const Buy = () => {
                 />
               </div>
               
-              <Select value={propertyType} onValueChange={setPriceRange}>
+              <Select value={priceRange} onValueChange={setPriceRange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Price Range" />
                 </SelectTrigger>
