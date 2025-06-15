@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, MapPin, Home, Building, TreePine, Calendar, Star, Phone, Mail, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,12 +21,11 @@ const Index = () => {
               </div>
             </div>
             
-            <nav className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-gray-700 hover:text-blue-700 font-medium transition-colors">Home</a>
-              <a href="#" className="text-gray-700 hover:text-blue-700 font-medium transition-colors">Buy</a>
-              <a href="#" className="text-gray-700 hover:text-blue-700 font-medium transition-colors">Rent</a>
-              <a href="#" className="text-gray-700 hover:text-blue-700 font-medium transition-colors">Sell</a>
-              <a href="#" className="text-gray-700 hover:text-blue-700 font-medium transition-colors">Contact</a>
+            <nav className="hidden md:flex space-x-8">
+              <a href="/" className="text-blue-600 font-medium">Home</a>
+              <a href="/buy" className="text-gray-500 hover:text-gray-900">Buy</a>
+              <a href="/sell" className="text-gray-500 hover:text-gray-900">Sell</a>
+              <a href="/rent" className="text-gray-500 hover:text-gray-900">Rent</a>
             </nav>
             
             <AuthButton />
