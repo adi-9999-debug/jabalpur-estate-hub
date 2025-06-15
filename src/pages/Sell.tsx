@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Home, MapPin, Camera, DollarSign, Phone, Mail, CheckCircle } from 'lucide-react';
+import { Home, MapPin, Camera, DollarSign, Phone, Mail, CheckCircle, Upload, X } from 'lucide-react';
 import AuthButton from '@/components/AuthButton';
+import { useToast } from '@/hooks/use-toast';
 
 const Sell = () => {
   const [formData, setFormData] = useState({
@@ -24,14 +25,76 @@ const Sell = () => {
     contactEmail: ''
   });
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles(prev => [...prev, ...files]);
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Property listing submitted:', formData);
-    // Here you would typically send the data to your backend
+    
+    // Basic validation
+    if (!formData.title || !formData.price || !formData.propertyType) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      console.log('Property listing submitted:', formData);
+      console.log('Files uploaded:', selectedFiles.map(f => f.name));
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Success!",
+        description: "Your property has been listed successfully.",
+      });
+      
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        price: '',
+        propertyType: '',
+        bedrooms: '',
+        bathrooms: '',
+        area: '',
+        location: '',
+        address: '',
+        contactName: '',
+        contactPhone: '',
+        contactEmail: ''
+      });
+      setSelectedFiles([]);
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit property listing. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -92,15 +155,16 @@ const Sell = () => {
                   <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Property Title</label>
+                      <label className="block text-sm font-medium mb-2">Property Title *</label>
                       <Input
                         placeholder="e.g., Luxury 3BHK Villa"
                         value={formData.title}
                         onChange={(e) => handleInputChange('title', e.target.value)}
+                        required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Property Type</label>
+                      <label className="block text-sm font-medium mb-2">Property Type *</label>
                       <Select value={formData.propertyType} onValueChange={(value) => handleInputChange('propertyType', value)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select property type" />
@@ -131,11 +195,12 @@ const Sell = () => {
                   <h3 className="text-lg font-semibold mb-4">Property Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Price (₹)</label>
+                      <label className="block text-sm font-medium mb-2">Price (₹) *</label>
                       <Input
                         placeholder="85,00,000"
                         value={formData.price}
                         onChange={(e) => handleInputChange('price', e.target.value)}
+                        required
                       />
                     </div>
                     <div>
@@ -239,13 +304,54 @@ const Sell = () => {
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                     <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 mb-2">Upload property photos</p>
-                    <p className="text-sm text-gray-500">Drag and drop or click to select files</p>
-                    <Button variant="outline" className="mt-4">Choose Files</Button>
+                    <p className="text-sm text-gray-500 mb-4">Drag and drop or click to select files</p>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => document.getElementById('file-upload')?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Choose Files
+                    </Button>
                   </div>
+                  
+                  {/* Selected Files Display */}
+                  {selectedFiles.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium mb-2">Selected Files:</h4>
+                      <div className="space-y-2">
+                        {selectedFiles.map((file, index) => (
+                          <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded">
+                            <span className="text-sm text-gray-700">{file.name}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFile(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                  List My Property
+                <Button 
+                  type="submit" 
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Submitting...' : 'List My Property'}
                 </Button>
               </form>
             </CardContent>
