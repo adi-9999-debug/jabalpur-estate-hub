@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, MapPin, Home, Building, TreePine, Calendar, Star, Phone, Mail, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Link } from 'react-router-dom';
 import AuthButton from '@/components/AuthButton';
 
 const Index = () => {
@@ -22,10 +23,10 @@ const Index = () => {
             </div>
             
             <nav className="hidden md:flex space-x-8">
-              <a href="/" className="text-blue-600 font-medium">Home</a>
-              <a href="/buy" className="text-gray-500 hover:text-gray-900">Buy</a>
-              <a href="/sell" className="text-gray-500 hover:text-gray-900">Sell</a>
-              <a href="/rent" className="text-gray-500 hover:text-gray-900">Rent</a>
+              <Link to="/" className="text-blue-600 font-medium">Home</Link>
+              <Link to="/buy" className="text-gray-500 hover:text-gray-900">Buy</Link>
+              <Link to="/sell" className="text-gray-500 hover:text-gray-900">Sell</Link>
+              <Link to="/rent" className="text-gray-500 hover:text-gray-900">Rent</Link>
             </nav>
             
             <AuthButton />
@@ -225,9 +226,9 @@ const Index = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Buy Properties</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Rent Properties</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Sell Property</a></li>
+                <li><Link to="/buy" className="hover:text-white transition-colors">Buy Properties</Link></li>
+                <li><Link to="/rent" className="hover:text-white transition-colors">Rent Properties</Link></li>
+                <li><Link to="/sell" className="hover:text-white transition-colors">Sell Property</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
               </ul>
             </div>

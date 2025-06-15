@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Buy from "./pages/Buy";
+import Sell from "./pages/Sell";
+import Rent from "./pages/Rent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/buy" element={<Buy />} />
+            <Route path="/sell" element={<Sell />} />
+            <Route path="/rent" element={<Rent />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
