@@ -1,11 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Home, Building, TreePine, Calendar, Star, Phone, Mail, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import AuthButton from '@/components/AuthButton';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface Property {
+  id: string;
+  title: string;
+  price?: number;
+  monthly_rent?: number;
+  location: string | null;
+  bedrooms: number | null;
+  area: number | null;
+  images: string[] | null;
+  property_type: string;
+  type: 'sale' | 'rental';
+}
 
 const Index = () => {
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchFeaturedProperties();
+  }, []);
+
+  const fetchFeaturedProperties = async () => {
+    try {
+      // Fetch 2 sale properties
+      const { data: saleProperties, error: saleError } = await supabase
+        .from('sale_properties')
+        .select('*')
+        .limit(2);
+
+      // Fetch 1 rental property
+      const { data: rentalProperties, error: rentalError } = await supabase
+        .from('rental_properties')
+        .select('*')
+        .limit(1);
+
+      if (saleError || rentalError) {
+        console.error('Error fetching properties:', saleError || rentalError);
+        return;
+      }
+
+      const allProperties: Property[] = [
+        ...(saleProperties || []).map(p => ({ ...p, type: 'sale' as const })),
+        ...(rentalProperties || []).map(p => ({ ...p, type: 'rental' as const }))
+      ];
+
+      setFeaturedProperties(allProperties);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatPrice = (property: Property) => {
+    if (property.type === 'sale' && property.price) {
+      if (property.price >= 10000000) {
+        return `₹${(property.price / 10000000).toFixed(1)} Cr`;
+      } else if (property.price >= 100000) {
+        return `₹${(property.price / 100000).toFixed(1)} Lakh`;
+      } else {
+        return `₹${property.price.toLocaleString()}`;
+      }
+    } else if (property.type === 'rental' && property.monthly_rent) {
+      return `₹${property.monthly_rent.toLocaleString()}/month`;
+    }
+    return 'Price on request';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
       {/* Header */}
@@ -113,67 +183,69 @@ const Index = () => {
       <section className="py-16 px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Featured Properties</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                image: "/placeholder.svg",
-                title: "Luxury Villa in Napier Town",
-                price: "₹2.5 Cr",
-                location: "Napier Town, Jabalpur",
-                beds: "4 BHK",
-                area: "3,200 sq ft",
-                rating: 4.8
-              },
-              {
-                image: "/placeholder.svg",
-                title: "Modern Apartment in Civil Lines",
-                price: "₹85 Lakh",
-                location: "Civil Lines, Jabalpur",
-                beds: "3 BHK",
-                area: "1,800 sq ft",
-                rating: 4.6
-              },
-              {
-                image: "/placeholder.svg",
-                title: "Commercial Space in Vijay Nagar",
-                price: "₹1.2 Cr",
-                location: "Vijay Nagar, Jabalpur",
-                beds: "Office",
-                area: "2,500 sq ft",
-                rating: 4.7
-              }
-            ].map((property, index) => (
-              <div key={index} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
-                <div className="relative overflow-hidden">
-                  <img 
-                    src={property.image} 
-                    alt={property.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm font-medium">{property.rating}</span>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
+                  <div className="w-full h-48 bg-gray-200"></div>
+                  <div className="p-6">
+                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-blue-700 transition-colors">{property.title}</h3>
-                  <p className="text-2xl font-bold text-blue-700 mb-3">{property.price}</p>
-                  <div className="flex items-center gap-2 text-gray-600 mb-3">
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-sm">{property.location}</span>
+              ))}
+            </div>
+          ) : featuredProperties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredProperties.map((property) => (
+                <div key={property.id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={property.images && property.images.length > 0 ? property.images[0] : "/placeholder.svg"} 
+                      alt={property.title}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-sm font-medium">4.8</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
-                    <span>{property.beds}</span>
-                    <span>{property.area}</span>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2 group-hover:text-blue-700 transition-colors">{property.title}</h3>
+                    <p className="text-2xl font-bold text-blue-700 mb-3">{formatPrice(property)}</p>
+                    <div className="flex items-center gap-2 text-gray-600 mb-3">
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm">{property.location || 'Jabalpur'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
+                      <span>{property.bedrooms || 0} BHK</span>
+                      <span>{property.area || 0} sq ft</span>
+                    </div>
+                    <Link to={`/property/${property.id}/${property.type}`}>
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white rounded-xl transition-all duration-300">
+                        View Details
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white rounded-xl transition-all duration-300">
-                    View Details
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Home className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No properties available</h3>
+              <p className="text-gray-600 mb-4">Be the first to list your property!</p>
+              <div className="flex gap-4 justify-center">
+                <Link to="/sell">
+                  <Button>List for Sale</Button>
+                </Link>
+                <Link to="/rent/list">
+                  <Button variant="outline">List for Rent</Button>
+                </Link>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
