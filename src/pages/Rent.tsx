@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Search, MapPin, Home, Bath, Car, Heart, Calendar, Shield, Users } from 
 import AuthButton from '@/components/AuthButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface RentalProperty {
   id: string;
@@ -41,6 +41,7 @@ const Rent = () => {
   const [properties, setProperties] = useState<RentalProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProperties();
@@ -315,7 +316,12 @@ const Rent = () => {
                     </div>
                     
                     <div className="flex gap-2">
-                      <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700">View Details</Button>
+                      <Button 
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                        onClick={() => navigate(`/property/${property.id}/rental`)}
+                      >
+                        View Details
+                      </Button>
                       <Button variant="outline" className="flex-1">Contact Owner</Button>
                     </div>
                   </CardContent>

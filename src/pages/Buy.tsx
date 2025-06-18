@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Search, MapPin, Home, Bath, Car, Heart } from 'lucide-react';
 import AuthButton from '@/components/AuthButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface SaleProperty {
   id: string;
@@ -35,6 +35,7 @@ const Buy = () => {
   const [properties, setProperties] = useState<SaleProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProperties();
@@ -264,7 +265,12 @@ const Buy = () => {
                     </div>
                     
                     <div className="flex gap-2">
-                      <Button className="flex-1">View Details</Button>
+                      <Button 
+                        className="flex-1"
+                        onClick={() => navigate(`/property/${property.id}/sale`)}
+                      >
+                        View Details
+                      </Button>
                       <Button variant="outline" className="flex-1">Contact Agent</Button>
                     </div>
                   </CardContent>
