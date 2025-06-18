@@ -1,86 +1,114 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, Home, Bath, Car, Heart, Calendar, Shield, Users } from 'lucide-react';
 import AuthButton from '@/components/AuthButton';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface RentalProperty {
+  id: string;
+  title: string;
+  description: string | null;
+  monthly_rent: number;
+  security_deposit: number | null;
+  property_type: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  parking: number | null;
+  area: number | null;
+  furnished: string | null;
+  location: string | null;
+  address: string | null;
+  available_from: string | null;
+  lease_duration: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  amenities: string[] | null;
+  images: string[] | null;
+  created_at: string;
+}
 
 const Rent = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState('');
   const [propertyType, setPropertyType] = useState('');
   const [location, setLocation] = useState('');
+  const [properties, setProperties] = useState<RentalProperty[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Mock rental property data
-  const properties = [
-    {
-      id: 1,
-      title: "Furnished 2BHK Apartment",
-      price: "₹18,000/month",
-      location: "Napier Town, Jabalpur",
-      bedrooms: 2,
-      bathrooms: 2,
-      parking: 1,
-      area: "1,200 sq ft",
-      image: "/api/placeholder/400/250",
-      type: "Apartment",
-      furnished: "Fully Furnished",
-      deposit: "₹36,000"
-    },
-    {
-      id: 2,
-      title: "Spacious 3BHK House",
-      price: "₹25,000/month",
-      location: "Civil Lines, Jabalpur",
-      bedrooms: 3,
-      bathrooms: 2,
-      parking: 2,
-      area: "1,800 sq ft",
-      image: "/api/placeholder/400/250",
-      type: "House",
-      furnished: "Semi Furnished",
-      deposit: "₹50,000"
-    },
-    {
-      id: 3,
-      title: "Modern Studio Apartment",
-      price: "₹12,000/month",
-      location: "Vijay Nagar, Jabalpur",
-      bedrooms: 1,
-      bathrooms: 1,
-      parking: 1,
-      area: "600 sq ft",
-      image: "/api/placeholder/400/250",
-      type: "Apartment",
-      furnished: "Fully Furnished",
-      deposit: "₹24,000"
-    },
-    {
-      id: 4,
-      title: "Commercial Office Space",
-      price: "₹35,000/month",
-      location: "Wright Town, Jabalpur",
-      bedrooms: 0,
-      bathrooms: 2,
-      parking: 3,
-      area: "1,500 sq ft",
-      image: "/api/placeholder/400/250",
-      type: "Commercial",
-      furnished: "Unfurnished",
-      deposit: "₹70,000"
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const fetchProperties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('rental_properties')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching rental properties:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch rental properties",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setProperties(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch rental properties",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         property.location.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = !propertyType || property.type === propertyType;
-    const matchesLocation = !location || property.location.toLowerCase().includes(location.toLowerCase());
+                         (property.location && property.location.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesType = !propertyType || property.property_type === propertyType;
+    const matchesLocation = !location || (property.location && property.location.toLowerCase().includes(location.toLowerCase()));
     
-    return matchesSearch && matchesType && matchesLocation;
+    const matchesPrice = !priceRange || (() => {
+      const rent = property.monthly_rent;
+      switch (priceRange) {
+        case '0-15':
+          return rent <= 15000;
+        case '15-25':
+          return rent > 15000 && rent <= 25000;
+        case '25-40':
+          return rent > 25000 && rent <= 40000;
+        case '40+':
+          return rent > 40000;
+        default:
+          return true;
+      }
+    })();
+    
+    return matchesSearch && matchesType && matchesLocation && matchesPrice;
   });
+
+  const formatRent = (rent: number) => {
+    return `₹${rent.toLocaleString()}/month`;
+  };
+
+  const formatDeposit = (deposit: number | null) => {
+    if (!deposit) return 'Not specified';
+    return `₹${deposit.toLocaleString()}`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -143,10 +171,10 @@ const Rent = () => {
                   <SelectValue placeholder="Property Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Apartment">Apartment</SelectItem>
-                  <SelectItem value="House">House</SelectItem>
-                  <SelectItem value="Villa">Villa</SelectItem>
-                  <SelectItem value="Commercial">Commercial</SelectItem>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="house">House</SelectItem>
+                  <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="commercial">Commercial</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -193,7 +221,7 @@ const Rent = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-2xl font-bold text-gray-900">
-              {filteredProperties.length} Rental Properties Available
+              {loading ? 'Loading...' : `${filteredProperties.length} Rental Properties Available`}
             </h3>
             <Select>
               <SelectTrigger className="w-48">
@@ -208,77 +236,95 @@ const Rent = () => {
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProperties.map((property) => (
-              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative">
-                  <img
-                    src={property.image}
-                    alt={property.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                  >
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                  <div className="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-1 rounded text-xs font-medium">
-                    {property.furnished}
-                  </div>
-                </div>
-                
-                <CardHeader>
-                  <CardTitle className="text-lg">{property.title}</CardTitle>
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{property.location}</span>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-2xl font-bold text-emerald-600">{property.price}</span>
-                    <span className="text-sm text-gray-500">{property.area}</span>
-                  </div>
-                  
-                  <div className="text-sm text-gray-600 mb-4">
-                    <span>Security Deposit: {property.deposit}</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm text-gray-600 mb-4">
-                    {property.bedrooms > 0 ? (
-                      <div className="flex items-center">
-                        <Home className="h-4 w-4 mr-1" />
-                        <span>{property.bedrooms} Beds</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center">
-                        <Home className="h-4 w-4 mr-1" />
-                        <span>Office</span>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Card key={i} className="overflow-hidden">
+                  <div className="w-full h-48 bg-gray-200 animate-pulse"></div>
+                  <CardContent className="p-4">
+                    <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProperties.map((property) => (
+                <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="relative">
+                    <img
+                      src={property.images && property.images.length > 0 ? property.images[0] : "/placeholder.svg"}
+                      alt={property.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                    >
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                    {property.furnished && (
+                      <div className="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-1 rounded text-xs font-medium">
+                        {property.furnished.charAt(0).toUpperCase() + property.furnished.slice(1)} Furnished
                       </div>
                     )}
-                    <div className="flex items-center">
-                      <Bath className="h-4 w-4 mr-1" />
-                      <span>{property.bathrooms} Baths</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Car className="h-4 w-4 mr-1" />
-                      <span>{property.parking} Parking</span>
-                    </div>
                   </div>
                   
-                  <div className="flex gap-2">
-                    <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700">View Details</Button>
-                    <Button variant="outline" className="flex-1">Contact Owner</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{property.title}</CardTitle>
+                    {property.location && (
+                      <div className="flex items-center text-gray-600">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        <span className="text-sm">{property.location}</span>
+                      </div>
+                    )}
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-2xl font-bold text-emerald-600">{formatRent(property.monthly_rent)}</span>
+                      {property.area && <span className="text-sm text-gray-500">{property.area} sq ft</span>}
+                    </div>
+                    
+                    <div className="text-sm text-gray-600 mb-4">
+                      <span>Security Deposit: {formatDeposit(property.security_deposit)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-gray-600 mb-4">
+                      {property.bedrooms && property.bedrooms > 0 ? (
+                        <div className="flex items-center">
+                          <Home className="h-4 w-4 mr-1" />
+                          <span>{property.bedrooms} Beds</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <Home className="h-4 w-4 mr-1" />
+                          <span>Office</span>
+                        </div>
+                      )}
+                      <div className="flex items-center">
+                        <Bath className="h-4 w-4 mr-1" />
+                        <span>{property.bathrooms || 0} Baths</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Car className="h-4 w-4 mr-1" />
+                        <span>{property.parking || 0} Parking</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700">View Details</Button>
+                      <Button variant="outline" className="flex-1">Contact Owner</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
-          {filteredProperties.length === 0 && (
+          {!loading && filteredProperties.length === 0 && (
             <div className="text-center py-12">
               <Home className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No rental properties found</h3>

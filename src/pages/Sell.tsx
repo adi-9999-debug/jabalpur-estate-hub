@@ -8,8 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Home, MapPin, Camera, DollarSign, Phone, Mail, CheckCircle, Upload, X } from 'lucide-react';
 import AuthButton from '@/components/AuthButton';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const Sell = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -45,6 +48,17 @@ const Sell = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if user is logged in
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to list your property",
+        variant: "destructive"
+      });
+      window.location.href = '/auth';
+      return;
+    }
+
     // Basic validation
     if (!formData.title || !formData.price || !formData.propertyType) {
       toast({
@@ -58,11 +72,45 @@ const Sell = () => {
     setIsSubmitting(true);
     
     try {
-      console.log('Property listing submitted:', formData);
-      console.log('Files uploaded:', selectedFiles.map(f => f.name));
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Convert price to number
+      const price = parseFloat(formData.price.replace(/,/g, ''));
+      if (isNaN(price)) {
+        throw new Error('Invalid price format');
+      }
+
+      // Prepare the property data
+      const propertyData = {
+        user_id: user.id,
+        title: formData.title,
+        description: formData.description || null,
+        price: price,
+        property_type: formData.propertyType,
+        bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
+        bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
+        area: formData.area ? parseInt(formData.area) : null,
+        location: formData.location || null,
+        address: formData.address || null,
+        contact_name: formData.contactName || null,
+        contact_phone: formData.contactPhone || null,
+        contact_email: formData.contactEmail || null,
+        images: [] // For now, we'll store empty array. File upload can be added later
+      };
+
+      console.log('Inserting property:', propertyData);
+
+      // Insert into database
+      const { data, error } = await supabase
+        .from('sale_properties')
+        .insert([propertyData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
+
+      console.log('Property inserted successfully:', data);
       
       toast({
         title: "Success!",
@@ -86,16 +134,63 @@ const Sell = () => {
       });
       setSelectedFiles([]);
       
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error submitting property:', error);
       toast({
         title: "Error",
-        description: "Failed to submit property listing. Please try again.",
+        description: error.message || "Failed to submit property listing. Please try again.",
         variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Show login prompt if user is not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <Home className="h-8 w-8 text-blue-600" />
+                <h1 className="ml-2 text-xl font-bold text-gray-900">The Silver Estates</h1>
+              </div>
+              <nav className="hidden md:flex space-x-8">
+                <a href="/" className="text-gray-500 hover:text-gray-900">Home</a>
+                <a href="/buy" className="text-gray-500 hover:text-gray-900">Buy</a>
+                <a href="/sell" className="text-blue-600 font-medium">Sell</a>
+                <a href="/rent" className="text-gray-500 hover:text-gray-900">Rent</a>
+              </nav>
+              <AuthButton />
+            </div>
+          </div>
+        </header>
+
+        {/* Login Required Message */}
+        <section className="py-20">
+          <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Authentication Required</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-6">You need to be logged in to list your property for sale.</p>
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  onClick={() => window.location.href = '/auth'}
+                >
+                  Login / Sign Up
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -214,7 +309,7 @@ const Sell = () => {
                           <SelectItem value="2">2 BHK</SelectItem>
                           <SelectItem value="3">3 BHK</SelectItem>
                           <SelectItem value="4">4 BHK</SelectItem>
-                          <SelectItem value="5+">5+ BHK</SelectItem>
+                          <SelectItem value="5">5+ BHK</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -229,7 +324,7 @@ const Sell = () => {
                           <SelectItem value="2">2</SelectItem>
                           <SelectItem value="3">3</SelectItem>
                           <SelectItem value="4">4</SelectItem>
-                          <SelectItem value="5+">5+</SelectItem>
+                          <SelectItem value="5">5+</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
