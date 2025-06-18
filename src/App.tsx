@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Buy from "./pages/Buy";
 import Sell from "./pages/Sell";
 import Rent from "./pages/Rent";
+import RentListProperty from "./pages/RentListProperty";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/buy" element={<Buy />} />
             <Route path="/sell" element={<Sell />} />
             <Route path="/rent" element={<Rent />} />
+            <Route path="/rent/list" element={<RentListProperty />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

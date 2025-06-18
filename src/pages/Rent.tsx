@@ -293,7 +293,10 @@ const Rent = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Have a Property to Rent Out?</h2>
           <p className="text-xl mb-8">List your property and find reliable tenants quickly</p>
-          <Button className="bg-white text-emerald-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold">
+          <Button 
+            className="bg-white text-emerald-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold"
+            onClick={() => window.location.href = '/rent/list'}
+          >
             List Your Property
           </Button>
         </div>
