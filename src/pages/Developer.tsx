@@ -36,18 +36,86 @@ const Developer = () => {
         </div>
       </header>
 
-      {/* Developer Section */}
+      {/* Main Content */}
       <section className="py-12 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Meet the <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">Developer</span>
+              Meet the <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">Team</span>
             </h1>
-            <p className="text-lg text-gray-600">The creative mind behind The Silver Estates platform</p>
+            <p className="text-lg text-gray-600">The creative minds behind The Silver Estates platform</p>
           </div>
+
+          {/* Owner Profile Card */}
+          <Card className="mb-12 overflow-hidden shadow-2xl">
+            <CardHeader>
+              <CardTitle className="text-center text-2xl text-blue-600">Owner Details</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                {/* Owner Image */}
+                <div className="relative">
+                  <img 
+                    src="/lovable-uploads/4af28cad-b87b-4d5c-b3c6-4a97c56a117a.png" 
+                    alt="Pranjal Thakur - Owner"
+                    className="w-full h-64 md:h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                </div>
+                
+                {/* Owner Info */}
+                <div className="p-8">
+                  <h2 className="text-3xl font-bold text-gray-800 mb-2">Pranjal Thakur</h2>
+                  <p className="text-lg text-blue-600 mb-6">Business Owner</p>
+                  
+                  <div className="space-y-4 mb-8">
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-5 h-5 text-gray-600" />
+                      <a href="tel:7509999470" className="text-gray-700 hover:text-blue-600 transition-colors">
+                        +91 7509999470
+                      </a>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-5 h-5 text-gray-600" />
+                      <a href="mailto:pranjal7509999470@gmail.com" className="text-gray-700 hover:text-blue-600 transition-colors">
+                        pranjal7509999470@gmail.com
+                      </a>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <Instagram className="w-5 h-5 text-gray-600" />
+                      <a href="https://instagram.com/pranjal_th999" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600 transition-colors">
+                        @pranjal_th999
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <Button 
+                      className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700"
+                      onClick={() => window.location.href = 'tel:7509999470'}
+                    >
+                      <Phone className="w-4 h-4 mr-2" />
+                      Contact
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <a href="https://instagram.com/pranjal_th999" target="_blank" rel="noopener noreferrer">
+                        <Instagram className="w-4 h-4 mr-2" />
+                        Follow
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Developer Profile Card */}
           <Card className="mb-12 overflow-hidden shadow-2xl">
+            <CardHeader>
+              <CardTitle className="text-center text-2xl text-emerald-600">Developer Details</CardTitle>
+            </CardHeader>
             <CardContent className="p-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                 {/* Developer Image */}
@@ -63,33 +131,33 @@ const Developer = () => {
                 {/* Developer Info */}
                 <div className="p-8">
                   <h2 className="text-3xl font-bold text-gray-800 mb-2">Aditya Tiwari</h2>
-                  <p className="text-lg text-blue-600 mb-6">Full Stack Developer & AI/ML Engineer</p>
+                  <p className="text-lg text-emerald-600 mb-6">Full Stack Developer & AI/ML Engineer</p>
                   
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center gap-3">
                       <Phone className="w-5 h-5 text-gray-600" />
-                      <a href="tel:6262069047" className="text-gray-700 hover:text-blue-600 transition-colors">
+                      <a href="tel:6262069047" className="text-gray-700 hover:text-emerald-600 transition-colors">
                         +91 6262069047
                       </a>
                     </div>
                     
                     <div className="flex items-center gap-3">
                       <Mail className="w-5 h-5 text-gray-600" />
-                      <a href="mailto:adityatiwari.aiml@gmail.com" className="text-gray-700 hover:text-blue-600 transition-colors">
+                      <a href="mailto:adityatiwari.aiml@gmail.com" className="text-gray-700 hover:text-emerald-600 transition-colors">
                         adityatiwari.aiml@gmail.com
                       </a>
                     </div>
                     
                     <div className="flex items-center gap-3">
                       <Instagram className="w-5 h-5 text-gray-600" />
-                      <a href="https://instagram.com/stopitadityahhh" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600 transition-colors">
+                      <a href="https://instagram.com/stopitadityahhh" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-emerald-600 transition-colors">
                         @stopitadityahhh
                       </a>
                     </div>
                     
                     <div className="flex items-center gap-3">
                       <Linkedin className="w-5 h-5 text-gray-600" />
-                      <a href="https://www.linkedin.com/in/aditya-tiwari-aiml/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600 transition-colors">
+                      <a href="https://www.linkedin.com/in/aditya-tiwari-aiml/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-emerald-600 transition-colors">
                         linkedin.com/in/aditya-tiwari-aiml
                       </a>
                     </div>
@@ -97,7 +165,7 @@ const Developer = () => {
                   
                   <div className="flex gap-4">
                     <Button 
-                      className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700"
+                      className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
                       onClick={() => window.location.href = 'tel:6262069047'}
                     >
                       <Phone className="w-4 h-4 mr-2" />
