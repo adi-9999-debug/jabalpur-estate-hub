@@ -111,6 +111,10 @@ const Rent = () => {
     return `₹${deposit.toLocaleString()}`;
   };
 
+  const handleContactAgent = () => {
+    window.location.href = 'tel:7509999470';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -325,7 +329,9 @@ const Rent = () => {
                       >
                         View Details
                       </Button>
-                      <Button variant="outline" className="flex-1">Contact Owner</Button>
+                      <Button variant="outline" className="flex-1" onClick={handleContactAgent}>
+                        Contact Agent
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
