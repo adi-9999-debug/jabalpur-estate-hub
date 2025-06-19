@@ -123,6 +123,7 @@ const Buy = () => {
               <a href="/buy" className="text-blue-600 font-medium">Buy</a>
               <a href="/sell" className="text-gray-500 hover:text-gray-900">Sell</a>
               <a href="/rent" className="text-gray-500 hover:text-gray-900">Rent</a>
+              <a href="/developer" className="text-gray-500 hover:text-gray-900">Developer</a>
             </nav>
             <AuthButton />
           </div>

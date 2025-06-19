@@ -104,6 +104,7 @@ const Index = () => {
               <Link to="/buy" className="text-gray-500 hover:text-gray-900">Buy</Link>
               <Link to="/sell" className="text-gray-500 hover:text-gray-900">Sell</Link>
               <Link to="/rent" className="text-gray-500 hover:text-gray-900">Rent</Link>
+              <Link to="/developer" className="text-gray-500 hover:text-gray-900">Developer</Link>
             </nav>
             
             {/* Desktop Auth Button */}
@@ -155,6 +156,13 @@ const Index = () => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Rent
+                </Link>
+                <Link 
+                  to="/developer" 
+                  className="text-gray-500 hover:text-gray-900 px-2 py-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Developer
                 </Link>
                 <div className="pt-2 border-t border-gray-200">
                   <AuthButton />
