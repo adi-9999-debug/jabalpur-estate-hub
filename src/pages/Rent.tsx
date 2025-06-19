@@ -175,7 +175,10 @@ const Rent = () => {
                   <SelectItem value="apartment">Apartment</SelectItem>
                   <SelectItem value="house">House</SelectItem>
                   <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="duplex">Duplex</SelectItem>
                   <SelectItem value="commercial">Commercial</SelectItem>
+                  <SelectItem value="plots">Plots</SelectItem>
+                  <SelectItem value="farm lands">Farm lands</SelectItem>
                 </SelectContent>
               </Select>
 

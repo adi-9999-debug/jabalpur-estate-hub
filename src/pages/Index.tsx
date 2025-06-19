@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Home, Building, TreePine, Calendar, Star, Phone, Mail, ArrowRight, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -195,7 +196,10 @@ const Index = () => {
                     <option>Apartment</option>
                     <option>House</option>
                     <option>Villa</option>
+                    <option>Duplex</option>
                     <option>Commercial</option>
+                    <option>Plots</option>
+                    <option>Farm lands</option>
                   </select>
                 </div>
                 <div className="relative">
@@ -332,9 +336,12 @@ const Index = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">Ready to Find Your Dream Property?</h2>
           <p className="text-lg md:text-xl text-blue-100 mb-6 md:mb-8 px-4">Get in touch with our expert team for personalized assistance</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button className="bg-white text-blue-700 hover:bg-blue-50 rounded-xl px-6 md:px-8 py-3 font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto">
+            <Button 
+              className="bg-white text-blue-700 hover:bg-blue-50 rounded-xl px-6 md:px-8 py-3 font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+              onClick={() => window.location.href = 'tel:7509999470'}
+            >
               <Phone className="w-5 h-5 mr-2" />
-              Call Us: +91 98765 43210
+              Call Us: +91 7509999470
             </Button>
             <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-700 rounded-xl px-6 md:px-8 py-3 font-semibold transition-all duration-300 transform hover:scale-105 w-full sm:w-auto">
               <Mail className="w-5 h-5 mr-2" />

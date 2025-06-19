@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -215,16 +214,19 @@ const Sell = () => {
               {/* Property Details */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="propertyType">Property Type *</Label>
-                  <Select value={formData.propertyType} onValueChange={(value) => setFormData({...formData, propertyType: value})}>
+                  <Label htmlFor="property_type">Property Type *</Label>
+                  <Select name="property_type" required>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
+                      <SelectValue placeholder="Select property type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="apartment">Apartment</SelectItem>
                       <SelectItem value="villa">Villa</SelectItem>
                       <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="duplex">Duplex</SelectItem>
+                      <SelectItem value="commercial">Commercial</SelectItem>
                       <SelectItem value="plot">Plot</SelectItem>
+                      <SelectItem value="farm lands">Farm lands</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
